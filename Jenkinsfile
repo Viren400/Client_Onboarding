@@ -28,6 +28,12 @@ pipeline {
             }
         }
 
+        stage('Terraform Format Check') {
+            steps {
+                sh 'terraform fmt -check'
+            }
+        }
+
     }
 
 }
