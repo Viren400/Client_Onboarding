@@ -2,6 +2,34 @@ pipeline {
 
     agent any
 
+    parameters {
+
+    string(
+        name: 'CLIENT_NAME',
+        defaultValue: 'demo',
+        description: 'Enter client name'
+    )
+
+    choice(
+        name: 'ENVIRONMENT',
+        choices: ['dev', 'qa', 'prod'],
+        description: 'Select environment'
+    )
+
+    string(
+        name: 'INSTANCE_COUNT',
+        defaultValue: '2',
+        description: 'Number of EC2 instances'
+    )
+
+    choice(
+        name: 'INSTANCE_TYPE',
+        choices: ['t3.micro', 't3.small', 't3.medium'],
+        description: 'EC2 Instance Type'
+    )
+
+}
+
     stages {
 
         stage('Checkout') {
@@ -45,7 +73,13 @@ pipeline {
         }
         stage('Terraform Apply') {
             steps {
-                sh 'terraform apply -auto-approve'
+                sh """
+                terraform apply -auto-approve\
+                -var="client_name=${params.CLIENT_NAME}" \  
+                -var="environment=${params.ENVIRONMENT}" \
+                -var="instance_count=${params.INSTANCE_COUNT}" \
+                -var="instance_type=${params.INSTANCE_TYPE}"
+                """
             }
         }
     post {
