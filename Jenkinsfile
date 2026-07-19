@@ -28,10 +28,10 @@ pipeline {
             description: 'Number of EC2 instances'
         )
 
-        choice(
-            name: 'INSTANCE_TYPE',
-            choices: ['t3.micro', 't3.small', 't3.medium'],
-            description: 'Select EC2 Instance Type'
+       string(
+            name: 'INSTANCE_TYPES',
+            defaultValue: 't3.micro',
+            description: 'Enter instance types separated by commas. Example: t3.micro,t3.small'
         )
 
         booleanParam(
