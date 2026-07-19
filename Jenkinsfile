@@ -164,7 +164,7 @@ pipeline {
                     -var="create_rds=${params.CREATE_RDS}" \
                     -var="create_efs=${params.CREATE_EFS}" \
                     -var="multi_az=${params.MULTI_AZ}" \
-                    -var="backup_retention_period=${params.BACKUP_RETENTION}"
+                    -var="backup_retention_period=${params.BACKUP_RETENTION}"\
                     -var="client_index=${params.CLIENT_INDEX}" \
                     -var="key_name=${params.KEY_NAME}" \
                     -var="db_username=${params.DB_USERNAME}" \
@@ -204,7 +204,15 @@ pipeline {
                     -var="create_rds=${params.CREATE_RDS}" \
                     -var="create_efs=${params.CREATE_EFS}" \
                     -var="multi_az=${params.MULTI_AZ}" \
-                    -var="backup_retention_period=${params.BACKUP_RETENTION}"
+                    -var="backup_retention_period=${params.BACKUP_RETENTION}"\
+                    -var="client_index=${params.CLIENT_INDEX}" \
+                    -var="key_name=${params.KEY_NAME}" \
+                    -var="db_username=${params.DB_USERNAME}" \
+                    -var="db_password=${params.DB_PASSWORD}" \
+                    -var="db_instance_class=${params.DB_INSTANCE_CLASS}" \
+                    -var="db_allocated_storage=${params.DB_ALLOCATED_STORAGE}" \
+                    -var="db_engine=${params.DB_ENGINE}" \
+                    -var="db_engine_version=${params.DB_ENGINE_VERSION}" \
                     """
                 }
             }
