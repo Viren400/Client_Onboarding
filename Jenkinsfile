@@ -48,6 +48,20 @@ pipeline {
                 sh 'terraform apply -auto-approve'
             }
         }
+    post {
+        always {
+             echo "Pipeline execution completed."
+            }
+
+          success {
+             echo "Infrastructure deployed successfully."
+            }
+
+         failure {
+            echo "Pipeline failed. Please check the console output."
+            }
+
+          }
     }
 
 }
