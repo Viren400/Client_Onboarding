@@ -154,6 +154,27 @@ pipeline {
                 }
             }
         }
+        stage('Smoke Test') {
+            steps {
+                withCredentials([
+                    [
+                        $class: 'AmazonWebServicesCredentialsBinding',
+                        credentialsId: 'aws-creds'
+                    ]
+                ]) {
+
+                    sh '''
+                    echo "Checking EC2 instances..."
+
+                    aws ec2 describe-instances \
+                    --filters Name=instance-state-name,Values=running \
+                    --query "Reservations[*].Instances[*].[InstanceId,State.Name]" \
+                    --output table
+                    '''
+                }
+            }
+        }
+
     }
 
     post {
