@@ -1,0 +1,14 @@
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+terraform.tfvars
+
+# SSH Keys
+viren-key
+viren-key.pub
+*.pem
+
+# OS files
+.DS_Store
+Thumbs.db
