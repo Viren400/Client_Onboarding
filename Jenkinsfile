@@ -60,18 +60,27 @@ pipeline {
                 sh 'terraform fmt -check'
             }
         }
-
         stage('Terraform Plan') {
             steps {
-                sh """
-                terraform plan \
-                -var="client_name=${params.CLIENT_NAME}" \
-                -var="environment=${params.ENVIRONMENT}" \
-                -var="instance_count=${params.INSTANCE_COUNT}" \
-                -var="instance_type=${params.INSTANCE_TYPE}"
-                """
+                withCredentials([
+                    [
+                        $class: 'AmazonWebServicesCredentialsBinding',
+                        credentialsId: 'aws-creds'
+                    ]
+                ]) {
+
+                    sh """
+                    terraform plan \
+                    -var="client_name=${params.CLIENT_NAME}" \
+                    -var="environment=${params.ENVIRONMENT}" \
+                    -var="instance_count=${params.INSTANCE_COUNT}" \
+                    -var="instance_type=${params.INSTANCE_TYPE}"
+                    """
+
+                }
             }
         }
+        
 
         stage('Manual Approval') {
             steps {
@@ -81,13 +90,22 @@ pipeline {
 
         stage('Terraform Apply') {
             steps {
-                sh """
-                terraform apply -auto-approve \
-                -var="client_name=${params.CLIENT_NAME}" \
-                -var="environment=${params.ENVIRONMENT}" \
-                -var="instance_count=${params.INSTANCE_COUNT}" \
-                -var="instance_type=${params.INSTANCE_TYPE}"
-                """
+                withCredentials([
+                    [
+                        $class: 'AmazonWebServicesCredentialsBinding',
+                        credentialsId: 'aws-creds'
+                    ]
+                ]) {
+
+                    sh """
+                    terraform apply -auto-approve \
+                    -var="client_name=${params.CLIENT_NAME}" \
+                    -var="environment=${params.ENVIRONMENT}" \
+                    -var="instance_count=${params.INSTANCE_COUNT}" \
+                    -var="instance_type=${params.INSTANCE_TYPE}"
+                    """
+
+                }
             }
         }
     }
