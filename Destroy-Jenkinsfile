@@ -1,0 +1,11 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Destroy Pipeline') {
+            steps {
+                echo 'Destroy Pipeline Started'
+            }
+        }
+    }
+}
