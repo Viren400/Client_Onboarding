@@ -29,7 +29,7 @@ pipeline {
         )
 
        string(
-            name: 'INSTANCE_TYPES',
+            name: 'INSTANCE_TYPE',
             defaultValue: 't3.micro',
             description: 'Enter instance types separated by commas. Example: t3.micro,t3.small'
         )
