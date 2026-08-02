@@ -1,11 +1,90 @@
 pipeline {
+
     agent any
 
+    parameters {
+
+        string(
+            name: 'CLIENT_NAME',
+            defaultValue: '',
+            description: 'Enter Client Name'
+        )
+
+        choice(
+            name: 'ENVIRONMENT',
+            choices: ['dev', 'qa', 'prod'],
+            description: 'Select Environment'
+        )
+
+    }
+
     stages {
-        stage('Destroy Pipeline') {
+
+        stage('Checkout') {
             steps {
-                echo 'Destroy Pipeline Started'
+                checkout scm
             }
         }
+
+        stage('Terraform Init') {
+            steps {
+
+                withCredentials([
+                    [
+                        $class: 'AmazonWebServicesCredentialsBinding',
+                        credentialsId: 'aws-creds'
+                    ]
+                ]) {
+
+                    sh """
+                    terraform init \
+                    -reconfigure \
+                    -backend-config="bucket=viren-client-onboarding-tf-state" \
+                    -backend-config="key=${params.CLIENT_NAME}/${params.ENVIRONMENT}/terraform.tfstate" \
+                    -backend-config="region=us-east-1" \
+                    -backend-config="dynamodb_table=terraform-lock" \
+                    -backend-config="encrypt=true"
+                    """
+                }
+            }
+        }
+
+        stage('Terraform Destroy') {
+            steps {
+
+                withCredentials([
+                    [
+                        $class: 'AmazonWebServicesCredentialsBinding',
+                        credentialsId: 'aws-creds'
+                    ]
+                ]) {
+
+                    sh """
+                    terraform destroy -auto-approve \
+                    -var="client_name=${params.CLIENT_NAME}" \
+                    -var="environment=${params.ENVIRONMENT}"
+                    """
+
+                }
+            }
+        }
+
     }
+
+    post {
+
+        always {
+            echo "Destroy pipeline completed."
+        }
+
+        success {
+            echo "Infrastructure destroyed successfully."
+        }
+
+        failure {
+            echo "Destroy failed."
+        }
+
+    }
+
 }
