@@ -29,7 +29,7 @@ pipeline {
         )
 
        string(
-            name: 'INSTANCE_TYPE',
+            name: 'INSTANCE_TYPES',
             defaultValue: 't3.micro',
             description: 'Enter instance types separated by commas. Example: t3.micro,t3.small'
         )
@@ -128,7 +128,23 @@ pipeline {
 
         stage('Terraform Init') {
             steps {
-                sh 'terraform init'
+                withCredentials([
+                    [
+                        $class: 'AmazonWebServicesCredentialsBinding',
+                        credentialsId: 'aws-creds'
+                    ]
+                ]) {
+
+                    sh """
+                    terraform init \
+                    -reconfigure \
+                    -backend-config="bucket=viren-client-onboarding-tf-state" \
+                    -backend-config="key=${params.CLIENT_NAME}/${params.ENVIRONMENT}/terraform.tfstate" \
+                    -backend-config="region=us-east-1" \
+                    -backend-config="dynamodb_table=terraform-lock" \
+                    -backend-config="encrypt=true"
+                    """
+                }
             }
         }
 

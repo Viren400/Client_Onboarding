@@ -10,6 +10,14 @@ RUN apt-get update && \
     unzip && \
     apt-get clean
 
+RUN jenkins-plugin-cli --plugins \
+    workflow-aggregator \
+    git \
+    github \
+    credentials \
+    credentials-binding \
+    aws-credentials 
+
 # Install Terraform
 ARG TERRAFORM_VERSION=1.13.0
 
