@@ -232,6 +232,63 @@ pipeline {
                     """
                 }
             }
+        
+        }
+        stage('Generate tfvars') {
+
+            steps {
+
+                writeFile file: 'deployment.tfvars', text: """
+        client_name = "${params.CLIENT_NAME}"
+        environment = "${params.ENVIRONMENT}"
+        aws_region = "${params.AWS_REGION}"
+        client_index = ${params.CLIENT_INDEX}
+
+        instance_type = "${params.INSTANCE_TYPE}"
+        instance_count = ${params.INSTANCE_COUNT}
+
+        key_name = "${params.KEY_NAME}"
+
+        db_username = "${params.DB_USERNAME}"
+        db_password = "${params.DB_PASSWORD}"
+
+        create_rds = ${params.CREATE_RDS}
+
+        db_instance_class = "${params.DB_INSTANCE_CLASS}"
+        db_allocated_storage = ${params.DB_ALLOCATED_STORAGE}
+
+        multi_az = ${params.MULTI_AZ}
+        backup_retention_period = ${params.BACKUP_RETENTION}
+
+        create_alb = ${params.CREATE_ALB}
+        create_efs = ${params.CREATE_EFS}
+        create_nat_gateway = false
+
+        db_engine = "${params.DB_ENGINE}"
+        db_engine_version = "${params.DB_ENGINE_VERSION}"
+        """
+            }
+        }
+        stage('Upload tfvars') {
+
+            steps {
+
+                withCredentials([
+                    [
+                        $class: 'AmazonWebServicesCredentialsBinding',
+                        credentialsId: 'aws-creds'
+                    ]
+                ]) {
+
+                    sh """
+                    aws s3 cp deployment.tfvars \
+                    s3://viren-client-onboarding-tf-state/${params.CLIENT_NAME}/${params.ENVIRONMENT}/deployment.tfvars
+                    """
+
+                }
+
+            }
+
         }
         stage('Smoke Test') {
             steps {
